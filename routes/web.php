@@ -31,5 +31,11 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         $router->get('/empleados/{id}', 'EmpleadoController@show');
         $router->put('/empleados/{id}', 'EmpleadoController@update');
         $router->delete('/empleados/{id}', 'EmpleadoController@destroy');
+        //controllador para api de jornadas laborales
+        $router->get('/jornadas', 'JornadaController@index');
+        $router->post('/jornadas', 'JornadaController@store');
+        $router->get('/jornadas/{id}', 'JornadaController@show');
+        $router->put('/jornadas/{id}', 'JornadaController@update');
+        $router->delete('/jornadas/{id}', 'JornadaController@destroy');
     });
 });

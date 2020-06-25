@@ -3,14 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Empleado;
-use Faker\Provider\File;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class EmpleadoController extends Controller
 {
     public function index()
     {
-        $empleados = Empleado::all();
+        $empleados = DB::table('empleados')
+            ->join('jornadas', 'empleados.id_jornada', 'jornadas.id')
+            ->select(
+                'empleados.*',
+                'jornadas.jornada'
+            )
+            ->get();
         return response()->json([
             'total_empleados' => count($empleados),
             'empleados' => $empleados
@@ -33,12 +39,20 @@ class EmpleadoController extends Controller
     }
     public function show($id)
     {
-        $empleado = Empleado::find($id);
-        if (is_null($empleado)) {
+
+        if (is_null(Empleado::find($id))) {
             return response()->json([
                 'Error' => 'no se encontro el empleado con dicho id.'
             ], 404);
         }
+        $empleado = DB::table('empleados')
+            ->where('empleados.id', $id)
+            ->join('jornadas', 'empleados.id_jornada', 'jornadas.id')
+            ->select(
+                'empleados.*',
+                'jornadas.jornada'
+            )
+            ->first();
         return response()->json([
             'empleado' => $empleado
         ], 200);
@@ -120,7 +134,7 @@ class EmpleadoController extends Controller
             'tiempo_puesto' => 'required|max:255|string',
             'tipo_contratacion' => 'required|max:255|string',
             'tipo_personal' => 'required|max:255|string',
-            'id_jornada' => 'required|numeric',
+            'id_jornada' => 'required|numeric|exists:jornadas,id',
             'rotacion_turnos' => 'required|max:255|string',
             'experiencia_puesto_actual' => 'required|max:255|string',
             'experiencia_puesto_laboral' => 'required|max:255|string',

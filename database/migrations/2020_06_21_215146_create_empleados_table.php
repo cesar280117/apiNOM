@@ -54,11 +54,13 @@ class CreateEmpleadosTable extends Migration
             $table->string('experiencia_puesto_actual');
             $table->string('experiencia_puesto_laboral');
             $table->string('hace_ejercicio');
-            $table->decimal('salario',8,2);
+            $table->decimal('salario', 8, 2);
             $table->string('estatus');
             $table->string('nivel_pago');
             $table->string('division');
             $table->timestamps();
+
+            $table->foreign('id_jornada')->references('id')->on('jornadas')->onDelete('cascade');
         });
     }
 
