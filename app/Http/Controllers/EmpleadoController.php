@@ -4,17 +4,22 @@ namespace App\Http\Controllers;
 
 use App\Empleado;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class EmpleadoController extends Controller
 {
     public function index()
     {
+        $empresa = Auth::user()->rfc;
         $empleados = DB::table('empleados')
+            ->where('empleados.rfc_empresa', $empresa)
             ->join('jornadas', 'empleados.id_jornada', 'jornadas.id')
+            ->join('empresas', 'empleados.rfc_empresa', 'empresas.rfc')
             ->select(
                 'empleados.*',
-                'jornadas.jornada'
+                'jornadas.jornada',
+                'empresas.nombre_empresa'
             )
             ->get();
         return response()->json([
@@ -31,6 +36,7 @@ class EmpleadoController extends Controller
         } else {
             $datos['foto_empleado'] = 'default.PNG';
         }
+        $datos['rfc_empresa'] = Auth::user()->rfc;
         $empleado = Empleado::create($datos);
         return response()->json([
             'mensaje' => 'se registro con exito el empleado',
@@ -39,18 +45,26 @@ class EmpleadoController extends Controller
     }
     public function show($id)
     {
-
-        if (is_null(Empleado::find($id))) {
+        $empresa = Auth::user()->rfc;
+        $empleado = Empleado::find($id);
+        if (is_null($empleado)) {
             return response()->json([
                 'Error' => 'no se encontro el empleado con dicho id.'
             ], 404);
         }
+        if ($empresa != $empleado['rfc_empresa']) {
+            return response()->json([
+                'Error' => 'Los datos no se encuentran disponibles.'
+            ], 500);
+        }
         $empleado = DB::table('empleados')
             ->where('empleados.id', $id)
             ->join('jornadas', 'empleados.id_jornada', 'jornadas.id')
+            ->join('empresas', 'empleados.rfc_empresa', 'empresas.frc')
             ->select(
                 'empleados.*',
-                'jornadas.jornada'
+                'jornadas.jornada',
+                'empresas.nombre_empresa'
             )
             ->first();
         return response()->json([
@@ -59,11 +73,17 @@ class EmpleadoController extends Controller
     }
     public function update(Request $request, $id)
     {
+        $empresa = Auth::user()->rfc;
         $empleado = Empleado::find($id);
         if (is_null($empleado)) {
             return response()->json([
                 'Error' => 'no se encontro el empleado con dicho id.'
             ], 404);
+        }
+        if ($empresa != $empleado['rfc_empresa']) {
+            return response()->json([
+                'Error' => 'Los datos no se encuentran disponibles.'
+            ], 500);
         }
         $this->validar($request, $id);
         $datos = $request->all();
@@ -81,11 +101,18 @@ class EmpleadoController extends Controller
     }
     public function destroy($id)
     {
+        $empresa = Auth::user()->frc;
         $empleado = Empleado::find($id);
+
         if (is_null($empleado)) {
             return response()->json([
                 'Error' => 'no existe empleado con dicho id.'
             ], 404);
+        }
+        if ($empresa != $empleado['rfc_empresa']) {
+            return response()->json([
+                'Error' => 'Los datos no se encuentran disponibles.'
+            ], 500);
         }
         if ($empleado['foto_empleado'] != 'default.PNG') {
 
@@ -142,7 +169,8 @@ class EmpleadoController extends Controller
             'salario' => 'required|numeric',
             'estatus' => 'required|max:255|string',
             'nivel_pago' => 'required|max:255|string',
-            'division' => 'required|max:255|string'
+            'division' => 'required|max:255|string',
+
         ]);
     }
 

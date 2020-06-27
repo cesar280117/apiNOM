@@ -49,7 +49,8 @@ class Empleado extends Model
         'salario',
         'estatus',
         'nivel_pago',
-        'division'
+        'division',
+        'rfc_empresa'
         
     ];
 }

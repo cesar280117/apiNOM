@@ -58,8 +58,10 @@ class CreateEmpleadosTable extends Migration
             $table->string('estatus');
             $table->string('nivel_pago');
             $table->string('division');
+            $table->string('rfc_empresa');
             $table->timestamps();
 
+            $table->foreign('rfc_empresa')->references('rfc')->on('empresas')->onDelete('cascade');
             $table->foreign('id_jornada')->references('id')->on('jornadas')->onDelete('cascade');
         });
     }

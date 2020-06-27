@@ -10,7 +10,8 @@ class Jornada extends Model
         'turno',
         'hora_inicial',
         'hora_final',
-        'jornada'
+        'jornada',
+        'rfc_empresa'
     ];
 
     protected $hidden = [

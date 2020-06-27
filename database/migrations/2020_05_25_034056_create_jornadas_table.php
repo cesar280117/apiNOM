@@ -19,7 +19,10 @@ class CreateJornadasTable extends Migration
             $table->string('hora_inicial');
             $table->string('hora_final');
             $table->string('jornada');
+            $table->string('rfc_empresa');
             $table->timestamps();
+            $table->foreign('rfc_empresa')->references('rfc')->on('empresas')->onDelete('cascade');
+
         });
     }
 

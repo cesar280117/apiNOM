@@ -15,16 +15,15 @@ $router->get('/', function () use ($router) {
 });
 
 $router->group(['prefix' => 'api'], function () use ($router) {
-    $router->post('/usuarios/login', 'UserController@login');
-    $router->post('/usuarios', 'UserController@store');
+    $router->post('/empresas/login', 'EmpresaController@login');
+    $router->post('/empresas', 'EmpresaController@store');
     $router->group(['middleware' => 'auth'], function () use ($router) {
-        //controlador para api de usuarios
-        $router->get('/usuarios', 'UserController@index');
-        $router->put('/usuarios/{id}', 'UserController@update');
-        $router->get('/usuarios/{id}', 'UserController@show');
-        $router->delete('/usuarios/{id}', 'UserController@destroy');
-        $router->post('/usuarios/logout', 'UserCOntroller@logout');
-        $router->get('/auth', 'UserController@auth');
+        //controlador para api de empresas
+        $router->get('/empresas', 'EmpresaController@index');
+        $router->put('/empresas/{rfc}', 'EmpresaController@update');
+        $router->get('/empresas/{rfc}', 'EmpresaController@show');
+        $router->post('/empresas/logout', 'EmpresaController@logout');
+        $router->get('/auth', 'EmpresaController@auth');
         //controlador para api de empleados
         $router->get('/empleados', 'EmpleadoController@index');
         $router->post('/empleados', 'EmpleadoController@store');
@@ -37,5 +36,6 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         $router->get('/jornadas/{id}', 'JornadaController@show');
         $router->put('/jornadas/{id}', 'JornadaController@update');
         $router->delete('/jornadas/{id}', 'JornadaController@destroy');
+        
     });
 });
