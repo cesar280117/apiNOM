@@ -54,8 +54,8 @@ class EmpleadoController extends Controller
         }
         if ($empresa != $empleado['rfc_empresa']) {
             return response()->json([
-                'Error' => 'Los datos no se encuentran disponibles.'
-            ], 500);
+                'Error' => 'Acceso prohibido'
+            ], 403);
         }
         $empleado = DB::table('empleados')
             ->where('empleados.id', $id)
@@ -82,8 +82,8 @@ class EmpleadoController extends Controller
         }
         if ($empresa != $empleado['rfc_empresa']) {
             return response()->json([
-                'Error' => 'Los datos no se encuentran disponibles.'
-            ], 500);
+                'Error' => 'Acceso prohibido'
+            ], 403);
         }
         $this->validar($request, $id);
         $datos = $request->all();
@@ -111,8 +111,8 @@ class EmpleadoController extends Controller
         }
         if ($empresa != $empleado['rfc_empresa']) {
             return response()->json([
-                'Error' => 'Los datos no se encuentran disponibles.'
-            ], 500);
+                'Error' => 'Acceso prohibido'
+            ], 403);
         }
         if ($empleado['foto_empleado'] != 'default.PNG') {
 
@@ -131,31 +131,31 @@ class EmpleadoController extends Controller
         $no_repetir_modificado = is_null($id) ? '' : ',' . $id;
         $this->validate($request, [
             'primer_nombre' => 'required|string|max:255',
-            'segundo_nombre' => 'max:255|string',
+            'segundo_nombre' => 'max:255|string|nullable',
             'apellido_paterno' => 'required|string|max:255',
-            'apellido_materno' => 'max:255|string',
+            'apellido_materno' => 'max:255|string|nullable',
             'estado_civil' => 'required|string|max:255',
-            'color_ojos' => 'max:255|string',
-            'color_cabello' => 'max:255|string',
+            'color_ojos' => 'max:255|string|nullable',
+            'color_cabello' => 'max:255|string|nullable',
             'peso' => 'required|numeric',
             'nacionalidad' => 'required|string|max:255',
             'estatura' => 'required|numeric',
-            'religion' => 'max:255|string',
-            'nombre_emergecia' => 'max:255|string',
+            'religion' => 'max:255|string|nullable',
+            'nombre_emergecia' => 'max:255|string|nullable',
             'curp' => 'required|max:18|unique:empleados,curp' . $no_repetir_modificado,
-            'fecha_nacimiento' => 'required',
+            'fecha_nacimiento' => 'required|max:10|nullable',
             'lugar_nacimiento' => 'required|max:255|string',
             'rfc' => 'required|unique:empleados,rfc' . $no_repetir_modificado,
             'domicilio' => 'required|max:255|string',
             'email' => 'required|unique:empleados,email' . $no_repetir_modificado,
-            'foto_empleado' => 'max:1000|image',
+            'foto_empleado' => 'max:1000|image|nullable',
             'sexo' => 'required|max:10|string',
-            'donador' => 'max:255|string',
+            'donador' => 'max:255|string|nullable',
             'padecimientos_medicos' => 'required|max:255|string',
             'alergia' => 'required|max:255|string',
             'nivel_estudios' => 'required|max:255|string',
             'ocupacion' => 'required|max:255|string',
-            'tipo_puesto' => 'max:255|string',
+            'tipo_puesto' => 'max:255|string|nullable',
             'departamento' => 'required|max:255|string',
             'trabaja_actualmente' => 'required|max:255|string',
             'tiempo_puesto' => 'required|max:255|string',
@@ -176,7 +176,7 @@ class EmpleadoController extends Controller
 
     private function save_image($foto)
     {
-        $nombre_foto = time() . '.' . $foto->getClientOriginalName();
+        $nombre_foto = time() . '_' . $foto->getClientOriginalName();
         $foto->move(base_path() . '/public/images/empleados', $nombre_foto);
         return $nombre_foto;
     }

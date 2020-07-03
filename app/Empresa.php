@@ -23,23 +23,8 @@ class Empresa extends Model implements AuthenticatableContract, AuthorizableCont
         'domicilio',
         'telefono',
         'curp',
-        'numero_acreditacion',
-        'numero_aprobacion',
-        'datos_dictamen',
-        'clave_norma',
-        'nombre_norma',
-        'nombre_verificador',
-        'fecha_verificacion',
-        'numero_dictamen',
-        'luegar_emicion_dictamen',
-        'fecha_emicion_dictamen',
-        'numero_registro_dictamen',
-        'metodos_factores_riesgo',
-        'vigencia_dictamenes_emitidos',
-        'numero_total_trabajadores',
-        'numero_trabajadores_entrevistar',
-        'numero_trabajadores_entrevistados',
         'password',
+        'imagen',
         'api_token'
     ];
 
@@ -56,6 +41,7 @@ class Empresa extends Model implements AuthenticatableContract, AuthorizableCont
     protected $hidden = [
         'password',
         'created_at',
-        'updated_at'
+        'updated_at',
+        'remember_token'
     ];
 }

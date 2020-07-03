@@ -53,8 +53,8 @@ class JornadaController extends Controller
         }
         if ($empresa != $jornada['rfc_empresa']) {
             return response()->json([
-                'Error' => 'No se puede acceder a dicha información.'
-            ], 500);
+                'Error' => 'Acceso prohibido.'
+            ], 403);
         }
 
         $jornada = DB::table('jornadas')
@@ -85,8 +85,8 @@ class JornadaController extends Controller
         }
         if ($empresa != $jornada['rfc_empresa']) {
             return response()->json([
-                'Error' => 'No se puede acceder a dicha información.'
-            ], 500);
+                'Error' => 'Acceso prohibido.'
+            ], 403);
         }
         $this->validar($request);
         $datos = $request->all();
@@ -108,8 +108,8 @@ class JornadaController extends Controller
         }
         if ($empresa != $jornada['rfc_empresa']) {
             return response()->json([
-                'Error' => 'No se puede acceder a dicha información.'
-            ], 500);
+                'Error' => 'Acceso prohibido.'
+            ], 403);
         }
 
         $jornada->delete();

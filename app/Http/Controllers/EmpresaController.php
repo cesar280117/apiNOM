@@ -19,8 +19,14 @@ class EmpresaController extends Controller
     }
     public function store(Request $request)
     {
+
         $this->validar($request);
         $datos = $request->all();
+        if ($request->hasFile('imagen')) {
+            $datos['imagen'] = $this->save_imagen($datos['imagen']);
+        } else {
+            $datos['imagen'] = 'default.PNG';
+        }
         $datos['password'] = Hash::make($datos['password']);
         $empresa = Empresa::create($datos);
         return response()->json([
@@ -38,13 +44,26 @@ class EmpresaController extends Controller
         }
         if (Auth::user()->rfc != $rfc) {
             return response()->json([
-                'Error' => 'No se puede acceder a dicha información.'
-            ], 500);
+                'Error' => 'Acceso prohibido.'
+            ], 403);
         }
 
         $this->validar($request, $rfc);
         $datos = $request->all();
-        $datos['password'] = Hash::make($datos['password']);
+        if ($request->hasFile('imagen')) {
+            if ($empresa['imagen'] != 'default.PNG') {
+                unlink(base_path() . '/public/images/empresas/' . $empresa['imagen']);
+            }
+            $datos['imagen'] = $this->save_imagen($datos['imagen']);
+        } else {
+            $datos['imagen'] = $empresa['imagen'];
+        }
+        if (is_null($datos['password'])) {
+            $datos['password'] = $empresa['password'];
+        } else {
+            $datos['password'] = Hash::make($datos['password']);
+        }
+
         $empresa->update($datos);
         return response()->json([
             'mensaje' => 'Se modifico con exito la empresa.',
@@ -61,8 +80,8 @@ class EmpresaController extends Controller
         }
         if (Auth::user()->rfc != $rfc) {
             return response()->json([
-                'Error' => 'No se puede acceder a dicha información.'
-            ], 500);
+                'Error' => 'Acceso prohibido.'
+            ], 403);
         }
 
         return response()->json([
@@ -83,12 +102,15 @@ class EmpresaController extends Controller
             $empresa->save();
 
             return response()->json([
-                'token' => $empresa['api_token']
+                'token' => $empresa['api_token'],
+                'empresa' => $empresa['nombre_empresa'],
+                'rfc' => $empresa['rfc'],
+                'imagen' => $empresa['imagen']
             ], 200);
         }
         return response()->json([
             'Error' => 'No se encuentra empresa con el RFC solicitado. Favor de verificar.'
-        ], 404);
+        ], 401);
     }
     public function logout()
     {
@@ -110,30 +132,24 @@ class EmpresaController extends Controller
     {
 
         $validar_modificar = is_null($rfc) ? '' : ',' . $rfc . ',rfc';
+        $password = is_null($rfc) ? 'required|min:8' : 'min:8|nullable';
+        $c_password = is_null($rfc) ? 'required|same:password' : 'same:password';
         $this->validate($request, [
             'rfc' => 'required|max:13|unique:empresas,rfc' . $validar_modificar,
-            'nombre_empresa' => 'required|max:255|unique:empresas,nombre_empresa'.$validar_modificar,
+            'nombre_empresa' => 'required|max:255|unique:empresas,nombre_empresa' . $validar_modificar,
             'domicilio' => 'required|max:255',
             'telefono' => 'required|numeric|unique:empresas,telefono' . $validar_modificar,
-            'curp' => 'max:18|unique:empresas,curp' . $validar_modificar,
-            'numero_acreditacion' => 'required|numeric',
-            'numero_aprobacion' => 'required|numeric',
-            'datos_dictamen' => 'required|max:255|string',
-            'clave_norma' => 'required|numeric',
-            'nombre_norma' => 'required|string|max:255',
-            'nombre_verificador' => 'required|max:255',
-            'fecha_verificacion' => 'required|max:255',
-            'numero_dictamen' => 'required|numeric',
-            'luegar_emicion_dictamen' => 'required|max:255|string',
-            'fecha_emicion_dictamen' => 'required|max:255|string',
-            'numero_registro_dictamen' => 'required|numeric',
-            'metodos_factores_riesgo' => 'required',
-            'vigencia_dictamenes_emitidos' => 'required|max:255|string',
-            'numero_total_trabajadores' => 'required|numeric',
-            'numero_trabajadores_entrevistar' => 'required|numeric',
-            'numero_trabajadores_entrevistados' => 'required|numeric',
-            'password' => 'required|min:6',
-            'c_password' => 'required|same:password'
+            'curp' => 'max:18|nullable|unique:empresas,curp' . $validar_modificar,
+            'imagen' => 'nullable|max:1000|image',
+            'password' => $password,
+            'c_password' => $c_password
         ]);
+    }
+
+    private function save_imagen($foto)
+    {
+        $nombreEMpresa = time() . '_' . $foto->getClientOriginalName();
+        $foto->move(base_path() . '/public/images/empresas', $nombreEMpresa);
+        return $nombreEMpresa;
     }
 }
